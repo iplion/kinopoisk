@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -39,25 +40,30 @@ public class KinopoiskGrabService {
             List.of()
         );
 
-        List<Long> grabbedFilmIds = kinopoiskItems.stream()
-            .map(KinopoiskItemDto::kinopoiskId)
-            .filter(Objects::nonNull)
+        Set<Long> uniqueFilmIds = new HashSet<>();
+
+        List<KinopoiskItemDto> validKinopoiskItems = kinopoiskItems.stream()
+            .filter(item -> item.kinopoiskId() != null)
+            .filter(item -> uniqueFilmIds.add(item.kinopoiskId()))
             .toList();
 
-        if (kinopoiskItems.size() != grabbedFilmIds.size()) {
+        if (kinopoiskItems.size() != validKinopoiskItems.size()) {
             log.warn(
-                "Received {} items from Kinopoisk, but only {} items have not null kinopoiskId",
+                "Received {} items from Kinopoisk, but only {} items valid",
                 kinopoiskItems.size(),
-                grabbedFilmIds.size()
+                validKinopoiskItems.size()
             );
         }
+
+        List<Long> grabbedFilmIds = validKinopoiskItems.stream()
+            .map(KinopoiskItemDto::kinopoiskId)
+            .toList();
 
         Set<Long> existingFilmIdsFromDb = grabbedFilmIds.isEmpty()
             ? Set.of()
             : filmRepository.findExistingFilmIds(grabbedFilmIds);
 
-        List<Film> newFilms = kinopoiskItems.stream()
-            .filter(item -> item.kinopoiskId() != null)
+        List<Film> newFilms = validKinopoiskItems.stream()
             .filter(item -> !existingFilmIdsFromDb.contains(item.kinopoiskId()))
             .map(kinopoiskItemToFilmMapper::toFilm)
             .toList();
@@ -66,7 +72,7 @@ public class KinopoiskGrabService {
 
         return new GrabFilmsResponseDto(
             kinopoiskItems.size(),
-            kinopoiskItems.size() - newFilms.size(),
+            existingFilmIdsFromDb.size(),
             newFilms.size()
         );
     }
