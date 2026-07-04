@@ -1,0 +1,28 @@
+services:
+  postgres:
+    container_name: films-postgres
+    image: postgres:17-alpine
+    ports:
+      - "127.0.0.1:5432:5432"
+    environment:
+      POSTGRES_DB: films
+      POSTGRES_USER: films_user
+      POSTGRES_PASSWORD: films_pass
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U films_user -d films" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - films-network
+    restart: unless-stopped
+
+volumes:
+  postgres-data:
+    name: films-postgres-data
+
+networks:
+  films-network:

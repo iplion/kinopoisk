@@ -1,10 +1,10 @@
-package com.iplion.kinopoisk;
+package com.iplion.films;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class KinopoiskApplicationTests {
+class FilmsApplicationTests {
 
     @Test
     void contextLoads() {

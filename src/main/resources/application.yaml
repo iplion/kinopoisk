@@ -1,3 +1,19 @@
+server:
+  port: 8080
+
 spring:
   application:
-    name: kinopoisk
+    name: films
+  datasource:
+    url: jdbc:postgresql://localhost:5432/films
+    username: films_user
+    password: films_pass
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
+app:
+  kinopoisk:
+    base-url: https://kinopoiskapiunofficial.tech
+    api-key: ${KINOPOISK_API_KEY}
