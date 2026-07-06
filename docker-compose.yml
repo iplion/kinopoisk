@@ -20,6 +20,16 @@ services:
       - films-network
     restart: unless-stopped
 
+  activemq:
+    image: apache/activemq:5.19.2
+    container_name: films-activemq
+    ports:
+      - "127.0.0.1:61616:61616"
+      - "127.0.0.1:8161:8161"
+    networks:
+      - films-network
+    restart: unless-stopped
+
 volumes:
   postgres-data:
     name: films-postgres-data

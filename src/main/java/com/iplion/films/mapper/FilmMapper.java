@@ -1,9 +1,7 @@
 package com.iplion.films.mapper;
 
+import com.iplion.films.dto.FilmImportItemDto;
 import com.iplion.films.entity.Film;
-import com.iplion.films.integration.kinopoisk.dto.KinopoiskCountryDto;
-import com.iplion.films.integration.kinopoisk.dto.KinopoiskGenreDto;
-import com.iplion.films.integration.kinopoisk.dto.KinopoiskItemDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -13,17 +11,17 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
-public interface KinopoiskItemToFilmMapper {
+public interface FilmMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "filmId", source = "kinopoiskId")
     @Mapping(target = "filmName", source = "item", qualifiedByName = "resolveFilmName")
     @Mapping(target = "rating", source = "item", qualifiedByName = "resolveRating")
     @Mapping(target = "description", source = "item", qualifiedByName = "resolveDescription")
-    Film toFilm(KinopoiskItemDto item);
+    Film toFilm(FilmImportItemDto item);
 
     @Named("resolveFilmName")
-    default String resolveFilmName(KinopoiskItemDto item) {
+    default String resolveFilmName(FilmImportItemDto item) {
         String filmName = joinNotBlank(" / ", item.nameRu(), item.nameEn(), item.nameOriginal());
 
         if (!hasText(filmName)) {
@@ -34,7 +32,7 @@ public interface KinopoiskItemToFilmMapper {
     }
 
     @Named("resolveRating")
-    default BigDecimal resolveRating(KinopoiskItemDto item) {
+    default BigDecimal resolveRating(FilmImportItemDto item) {
         if (item.ratingKinopoisk() != null) {
             return item.ratingKinopoisk();
         }
@@ -43,18 +41,16 @@ public interface KinopoiskItemToFilmMapper {
     }
 
     @Named("resolveDescription")
-    default String resolveDescription(KinopoiskItemDto item) {
+    default String resolveDescription(FilmImportItemDto item) {
         String countries = item.countries() == null
             ? null
             : item.countries().stream()
-            .map(KinopoiskCountryDto::country)
             .filter(this::hasText)
             .collect(Collectors.joining(", "));
 
         String genres = item.genres() == null
             ? null
             : item.genres().stream()
-            .map(KinopoiskGenreDto::genre)
             .filter(this::hasText)
             .collect(Collectors.joining(", "));
 

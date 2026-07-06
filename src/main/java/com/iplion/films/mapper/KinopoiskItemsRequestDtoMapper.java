@@ -9,7 +9,7 @@ import org.mapstruct.Named;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
-public interface GrabRequestToKinopoiskRequestMapper {
+public interface KinopoiskItemsRequestDtoMapper {
 
     @Mapping(target = "countries", source = "country", qualifiedByName = "integerToList")
     @Mapping(target = "genres", source = "genre", qualifiedByName = "integerToList")

@@ -5,6 +5,6 @@ import com.iplion.films.entity.Film;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
-public interface FilmToFilmDtoMapper {
+public interface FilmDtoMapper {
     FilmDto toFilmDto(Film film);
 }

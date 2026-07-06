@@ -23,7 +23,7 @@ public class KinopoiskClient {
 
     private final RestTemplate restTemplate;
 
-    public KinopoiskItemsResponseDto getFilmsList(KinopoiskItemsRequestDto request) {
+    public KinopoiskItemsResponseDto getItems(KinopoiskItemsRequestDto request) {
         try {
             return restTemplate.getForObject(
                 buildFilmsUri(request),
