@@ -24,8 +24,6 @@ public class GrabbedItemsConsumer {
 
         List<FilmImportItemDto> items = Objects.requireNonNullElse(message.items(), List.of());
 
-        log.info("Got message from grabbed-films. items count: {}", items.size());
-
         int savedItemsCount = filmImportService.processNewItems(items);
 
         log.info("Saved {} new films from grabbed-films message", savedItemsCount);

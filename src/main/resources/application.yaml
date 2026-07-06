@@ -24,3 +24,8 @@ app:
   activemq:
     queues:
       grabbed-films: grabbed.films.queue
+  scheduler:
+    grab-kinopoisk:
+      enabled: true
+      cron: "0 0 7 * * *"
+      items-num: 50

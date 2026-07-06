@@ -1,8 +1,7 @@
 package com.iplion.films.messaging;
 
 import com.iplion.films.config.ActiveMqProperties;
-import com.iplion.films.integration.kinopoisk.dto.KinopoiskItemDto;
-import com.iplion.films.mapper.FilmImportItemMapper;
+import com.iplion.films.dto.FilmImportItemDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jms.core.JmsTemplate;
@@ -15,15 +14,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GrabbedItemsProducer {
     private final JmsTemplate jmsTemplate;
-    private final FilmImportItemMapper mapper;
     private final ActiveMqProperties props;
 
-    public void sendItems(List<KinopoiskItemDto> items) {
-        var message = new GrabbedItemsMessageDto(
-            items.stream()
-                .map(mapper::toFilmImportItemDto)
-                .toList()
-        );
+    public void sendItems(List<FilmImportItemDto> items) {
+        var message = new GrabbedItemsMessageDto(items);
 
         jmsTemplate.convertAndSend(
             props.getQueueName(ActiveMqProperties.GRABBED_FILMS_QUEUE_KEY),

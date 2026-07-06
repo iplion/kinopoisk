@@ -39,10 +39,10 @@ public record GrabFilmsRequestDto(
     @Max(3000)
     Integer yearTo,
 
-    @Pattern(regexp = "^tt\\d+$", message = "imdbId должен быть в формате tt0133093")
+    @Pattern(regexp = "^tt\\d+$", message = "imdbId must match format tt0133093")
     String imdbId,
 
-    @Size(max = 255, message = "поисковый запрос не нужно делать длиннее 255 символов")
+    @Size(max = 255, message = "Search query must not be longer than 255 characters")
     String keyword,
 
     @Positive

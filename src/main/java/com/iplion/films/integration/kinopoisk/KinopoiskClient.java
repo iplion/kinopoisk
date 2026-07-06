@@ -33,7 +33,7 @@ public class KinopoiskClient {
             throw mapStatusException(e);
         } catch (RestClientException e) {
             throw new KinopoiskClientException(
-                "Ошибка соединения с Kinopoisk API",
+                "Connection error while calling Kinopoisk API",
                 HttpStatus.BAD_GATEWAY,
                 e
             );
@@ -61,22 +61,22 @@ public class KinopoiskClient {
     private KinopoiskClientException mapStatusException(HttpStatusCodeException e) {
         return switch (e.getStatusCode().value()) {
             case 401 -> new KinopoiskClientException(
-                "Пустой или неправильный токен Kinopoisk API",
+                "Kinopoisk API token is empty or invalid",
                 HttpStatus.BAD_GATEWAY,
                 e
             );
             case 402 -> new KinopoiskClientException(
-                "Превышен лимит запросов(или дневной, или общий) Kinopoisk API",
+                "Kinopoisk API request limit exceeded",
                 HttpStatus.BAD_GATEWAY,
                 e
             );
             case 429 -> new KinopoiskClientException(
-                "Слишком много запросов к Kinopoisk API. Лимит 5 запросов в секунду",
+                "Too many requests to Kinopoisk API. Limit is 5 requests per second",
                 HttpStatus.TOO_MANY_REQUESTS,
                 e
             );
             default -> new KinopoiskClientException(
-                "Ошибка Kinopoisk API: " + e.getStatusCode(),
+                "Kinopoisk API error: " + e.getStatusCode(),
                 HttpStatus.BAD_GATEWAY,
                 e
             );

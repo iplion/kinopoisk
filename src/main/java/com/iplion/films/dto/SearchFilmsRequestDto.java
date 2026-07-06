@@ -29,7 +29,7 @@ public record SearchFilmsRequestDto(
     @Max(3000)
     Integer yearTo,
 
-    @Size(max = 255, message = "поисковый запрос не нужно делать длиннее 255 символов")
+    @Size(max = 255, message = "Search query must not be longer than 255 characters")
     String keyword,
 
     @PositiveOrZero
