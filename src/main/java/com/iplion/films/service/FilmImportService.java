@@ -25,6 +25,8 @@ public class FilmImportService {
     @Transactional
     public int processNewItems(@NotNull List<FilmImportItemDto> items) {
         var filteredItems = filterNewItems(items);
+        // тут может быть гонка, можно это проработать,
+        // но логичнее пакетное обновление записей, т.к. данные на кинопоиске (рейтинг и пр) могут тоже обновляться
         saveFilms(filteredItems);
 
         return filteredItems.size();

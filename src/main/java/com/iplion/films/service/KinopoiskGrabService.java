@@ -44,7 +44,7 @@ public class KinopoiskGrabService {
         );
     }
 
-    public KinopoiskItemsResponseDto sendKinopoiskRequest(GrabFilmsRequestDto request) {
+    private KinopoiskItemsResponseDto sendKinopoiskRequest(GrabFilmsRequestDto request) {
         return kinopoiskClient.getItems(
             kinopoiskItemsRequestDtoMapper.toKinopoiskItemsRequest(request)
         );
