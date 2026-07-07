@@ -25,8 +25,14 @@ public class FilmImportService {
     @Transactional
     public int processNewItems(@NotNull List<FilmImportItemDto> items) {
         var filteredItems = filterNewItems(items);
+
+        if (filteredItems.isEmpty()) {
+            return 0;
+        }
+
         // тут может быть гонка, можно это проработать,
-        // но логичнее пакетное обновление записей, т.к. данные на кинопоиске (рейтинг и пр) могут тоже обновляться
+        // или логичнее пакетное обновление записей, т.к. данные на кинопоиске (рейтинг и пр) могут тоже обновляться
+        // в общем фиг знает как правильнее для тестового задания
         saveFilms(filteredItems);
 
         return filteredItems.size();
@@ -36,7 +42,7 @@ public class FilmImportService {
         Set<Long> uniqueFilmIds = new HashSet<>();
 
         List<FilmImportItemDto> validKinopoiskItems = items.stream()
-            .filter(item -> item.kinopoiskId() != null)
+            .filter(this::validateItem)
             .filter(item -> uniqueFilmIds.add(item.kinopoiskId()))
             .toList();
 
@@ -48,13 +54,15 @@ public class FilmImportService {
             );
         }
 
+        if (validKinopoiskItems.isEmpty()) {
+            return List.of();
+        }
+
         List<Long> grabbedFilmIds = validKinopoiskItems.stream()
             .map(FilmImportItemDto::kinopoiskId)
             .toList();
 
-        Set<Long> existingFilmIdsFromDb = grabbedFilmIds.isEmpty()
-            ? Set.of()
-            : filmRepository.findExistingFilmIds(grabbedFilmIds);
+        Set<Long> existingFilmIdsFromDb = filmRepository.findExistingFilmIds(grabbedFilmIds);
 
         return validKinopoiskItems.stream()
             .filter(item -> !existingFilmIdsFromDb.contains(item.kinopoiskId()))
@@ -67,5 +75,12 @@ public class FilmImportService {
             .toList();
 
         filmRepository.saveAll(newFilms);
+    }
+
+    private boolean validateItem(FilmImportItemDto item) {
+        return item.kinopoiskId() != null
+            && (item.nameRu() != null && !item.nameRu().isBlank()
+                || (item.nameEn() != null && !item.nameEn().isBlank())
+                || (item.nameOriginal() != null && !item.nameOriginal().isBlank()));
     }
 }

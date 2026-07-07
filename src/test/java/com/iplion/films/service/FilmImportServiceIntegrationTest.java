@@ -5,7 +5,6 @@ import com.iplion.films.entity.Film;
 import com.iplion.films.repository.FilmRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
@@ -17,14 +16,13 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@AutoConfigureMockMvc
 @ActiveProfiles("test")
 @SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
 @Sql(
     statements = "DELETE FROM films",
     executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
 )
-public class FilmImportServiceIT {
+public class FilmImportServiceIntegrationTest {
     @Autowired
     private FilmImportService filmImportService;
 
@@ -43,12 +41,12 @@ public class FilmImportServiceIT {
 
         var filmsAfter = filmRepository.findAll();
 
-        assertThat(savedFilms).isEqualTo(2);
+        assertThat(savedFilms).isEqualTo(3);
         assertThat(filmsBefore).hasSize(3);
-        assertThat(filmsAfter).hasSize(5);
+        assertThat(filmsAfter).hasSize(6);
         assertThat(filmsAfter)
             .extracting(Film::getFilmId)
-            .containsExactlyInAnyOrder(1001L, 1002L, 1003L, 2001L, 2002L);
+            .containsExactlyInAnyOrder(1001L, 1002L, 1003L, 2001L, 2002L, 777L);
 
         Film existingFilm = findByFilmId(filmsAfter, 1001L);
         assertThat(existingFilm.getFilmName()).isEqualTo("The Matrix");
@@ -64,6 +62,12 @@ public class FilmImportServiceIT {
         Film anotherNewFilm = findByFilmId(filmsAfter, 2002L);
         assertThat(anotherNewFilm.getFilmName()).isEqualTo("Another new film / Another new film EN");
         assertThat(anotherNewFilm.getRating()).isEqualByComparingTo("8.1");
+
+        Film strangeFilm = findByFilmId(filmsAfter, 777L);
+        assertThat(strangeFilm.getFilmName()).isEqualTo("Really strange film");
+        assertThat(strangeFilm.getYear()).isNull();
+        assertThat(strangeFilm.getRating()).isNull();
+        assertThat(strangeFilm.getDescription()).isEmpty();
     }
 
     private Film findByFilmId(List<Film> films, Long filmId) {
@@ -139,6 +143,19 @@ public class FilmImportServiceIT {
                 2022,
                 "FILM",
                 "https://example.com/another-new-film.jpg"
+            ),
+            new FilmImportItemDto(
+                777L,
+                null,
+                null,
+                "Really strange film",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
             )
         );
     }
